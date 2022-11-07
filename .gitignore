@@ -1,0 +1,26 @@
+__pycache__/
+
+# venv
+.venv
+
+# vscode
+.vscode
+
+# dist
+dist/
+
+# downloads
+var/
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
