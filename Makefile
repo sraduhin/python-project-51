@@ -4,9 +4,6 @@ install:
 build:
 	poetry build
 
-page-loader:
-	poetry run page-loader
-
 package-install:
 	python3 -m pip install --user dist/*.whl
 
