@@ -27,4 +27,4 @@ def download(url, dir):
 
 
 if __name__ == '__main__':
-    download('https://ru.hexlet.io/courses')
+    download('https://ru.hexlet.io/courses', 'var\\tmp')
