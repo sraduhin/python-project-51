@@ -9,6 +9,8 @@ def get_file_name(url):
     return re.sub(r'[./]', '-', host) + '.html'
 
 def download(url, dir):
+    print('url', url)
+    print('dir', dir)
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -17,14 +19,18 @@ def download(url, dir):
     except Exception as err:
         print(f'Other error occurred: {err}')
     else:
-        print('Success!')
         file_name = get_file_name(url)
         os.makedirs(dir, exist_ok=True)
         download_path = os.path.join(dir, file_name)
         with open(download_path, 'w', encoding='utf-8') as f:
             f.write(response.text)
-            print(download_path)
+            print('Success!')
+            return download_path
+
+
+def download_file_and_show_path(url, dir):
+    print(download(url, dir))
 
 
 if __name__ == '__main__':
-    download('https://ru.hexlet.io/courses', 'var\\tmp')
+    download_file_and_show_path('https://ru.hexlet.io/courses', 'var\\tmp')

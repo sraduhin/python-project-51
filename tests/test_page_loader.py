@@ -1,16 +1,22 @@
-import os
+import pathlib
 import tempfile
-import requests_mock
 from page_loader.downloader import download
 
+FIXTURES_DIR = 'tests/fixtures/expected'
 
-@requests_mock.Mocker()
-def test_download(mock):
-    url = 'https://ru.hexlet.io/courses'
-    excepted_fp = os.path.join('test', 'fixtures', 'expected', 'ru-hexlet-io-courses.html')
-    print(excepted_fp)
-    with open(excepted_fp, 'r') as f:
-        f = f.read()
-        print(f)
-        mock.get(url, text=f)
-        download(url)
+
+def test_download(requests_mock):
+    url = 'https://ru.someurl.io/tail'
+    
+    fixture_path_dir = FIXTURES_DIR.split('/')
+    fixture_path_file = pathlib.Path(*fixture_path_dir, 'chicken.html')
+    with open(fixture_path_file, 'r', encoding="utf-8") as expected:
+        expected = expected.read()
+        requests_mock.get(url, text=expected)
+        
+        with tempfile.TemporaryDirectory() as tempdir:
+            test_path_file = download(url, tempdir)
+            
+            with open(test_path_file, 'r', encoding="utf-8") as tested:
+                tested = tested.read()
+                assert expected == tested
