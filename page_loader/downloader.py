@@ -8,6 +8,7 @@ def get_file_name(url):
     host = url.split('//')[-1]
     return re.sub(r'[./]', '-', host) + '.html'
 
+
 def download(url, dir):
     print('url', url)
     print('dir', dir)
