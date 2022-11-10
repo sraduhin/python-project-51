@@ -2,7 +2,7 @@
 import argparse
 import os
 
-from page_loader import download
+from page_loader import main as loader
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
         '-o', '--output', help='download path', default=os.getcwd()
     )
     args = parser.parse_args()
-    print(download(args.url, args.output))
+    print(loader(args.url, args.output))
 
 
 if __name__ == '__main__':

@@ -7,12 +7,26 @@ from requests.exceptions import HTTPError
 VALID_EXTENSIONS = ['png', 'jpg']
 
 
-def get_file_name(url):
-    host = url.split('//')[-1]
-    return re.sub(r'[./]', '-', host) + '.html'
+def main(url, dir):
+    html_doc, name = parse_http(url)
+    #local_path = os.path.join(dir, name)
+    #local_pathfiles = local_path + '-files'
+    os.makedirs(local_pathfiles, exist_ok=True)
+    html_doc = save_pics(html_doc, local_pathfiles)
+    local_pagepath = local_path + '.html'
+    download_html(html_doc, local_pagepath)
+    return local_path
 
 
-def parse_http(url, dir):
+# ----------- utils
+def get_file_name(src):
+    filename = re.sub(r'(http[s]*?\://www.|http[s]*?\://|^www.)', '', src)
+    filename = re.sub(r'[./]', '-', filename)    
+    return re.sub(r'-$', '', filename)    
+#------------
+
+
+def parse_http(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -21,50 +35,33 @@ def parse_http(url, dir):
     except Exception as err:
         print(f'Other error occurred: {err}')
     else:
-        print('Success!')
-        return response.text
-'''
-def download(url, dir):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except HTTPError as http_err:
-        print(f'HTTP error occurred: {http_err}')
-    except Exception as err:
-        print(f'Other error occurred: {err}')
-    else:
-        file_name = get_file_name(url)
-        os.makedirs(dir, exist_ok=True)
-        download_path = os.path.join(dir, file_name)
-        with open(download_path, 'w', encoding='utf-8') as f:
-            f.write(response.text)
-            print('Success!')
-            return download_path'''
+        page_name = get_file_name(url)
+        return response.text, page_name
 
-def parse_img_tag(html_doc):
-    print(html_doc)
+def check_tags(tag, condition):
+    def wrapper(function):
+        def inner(doc):
+            soup = BeautifulSoup(doc, 'html.parser')
+            
+def save_pics(html_doc, dir):
     soup = BeautifulSoup(html_doc, 'html.parser')
-    img_links = []
     for link in soup.find_all('img'):
-        img_links.append(link.get('src'))
-    print(filter(img_links, ))
-    
+        src = link.get('src')
+        (filename, extension) = os.path.splitext(src)
+        if extension[1:] in VALID_EXTENSIONS:
+            picture = requests.get(src)
+            local_name = os.path.join(dir, get_file_name(filename) + extension)
+            with open(local_name, 'wb') as pic:
+                pic.write(picture.content)
+            soup.replace(src, local_name)
+        return soup.prettify()
+
 
 def download_html(html, path):
     with open(path, 'w', encoding='utf-8') as f:
         f.write(html)
-        print('Success!')
         return path
-
-def safe_pictures(pathfile):
-    with open(pathfile, 'r', encoding='utf-8') as html_doc:
-        html_doc = html_doc.read()
-        soup = BeautifulSoup(html_doc, 'html.parser')
-        
-
 
 
 if __name__ == '__main__':
-    html = parse_http('https://ru.hexlet.io/courses', 'var\\tmp')
-    parse_img_tag(html)
-    # safe_pictures('var\\tmp\\ru-hexlet-io-courses.html')
+    main('https://ru.hexlet.io/courses', 'var\\tmp')
