@@ -28,6 +28,7 @@ def main(url, dir):
             html = html_soup.prettify()
             for num, src in enumerate(origin_images):
                 html = html.replace(src, copies[num])
+        origin_assets = 
         return download_html(html, local_name)
 
 
@@ -47,7 +48,17 @@ def normalize(src):
 
 def find_images(html):
     images = []
-    for link in html.find_all('img'):
+    for link in html.find_all('link', 'script'):
+        src = link.get('src')
+        (_, extension) = os.path.splitext(src)
+        if extension[1:] in VALID_IMG_EXTENSIONS:
+            images.append(src)
+    return images
+
+
+def find_assets(html):
+    assets = []
+    for link in html.find_all('s'):
         src = link.get('src')
         (_, extension) = os.path.splitext(src)
         if extension[1:] in VALID_IMG_EXTENSIONS:
