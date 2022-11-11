@@ -3,30 +3,12 @@ import os
 import re
 from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
+from urllib.parse import urlparse
 
-VALID_EXTENSIONS = ['png', 'jpg']
+VALID_IMG_EXTENSIONS = ['png', 'jpg']
 
 
 def main(url, dir):
-    html_doc, name = parse_http(url)
-    #local_path = os.path.join(dir, name)
-    #local_pathfiles = local_path + '-files'
-    os.makedirs(local_pathfiles, exist_ok=True)
-    html_doc = save_pics(html_doc, local_pathfiles)
-    local_pagepath = local_path + '.html'
-    download_html(html_doc, local_pagepath)
-    return local_path
-
-
-# ----------- utils
-def get_file_name(src):
-    filename = re.sub(r'(http[s]*?\://www.|http[s]*?\://|^www.)', '', src)
-    filename = re.sub(r'[./]', '-', filename)    
-    return re.sub(r'-$', '', filename)    
-#------------
-
-
-def parse_http(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -35,26 +17,57 @@ def parse_http(url):
     except Exception as err:
         print(f'Other error occurred: {err}')
     else:
-        page_name = get_file_name(url)
-        return response.text, page_name
+        html_soup = BeautifulSoup(response.text, 'html.parser')
+        host, local_name = parse_url(url, dir)
+        local_dir = local_name.replace('.html', '-files')
+        os.makedirs(local_dir, exist_ok=True)
+        origin_images = find_images(html_soup)
+        if origin_images:
+            copies = localize_src(origin_images, local_dir)
+            download_images(origin_images, copies)
+            html = html_soup.prettify()
+            for num, src in enumerate(origin_images):
+                html = html.replace(src, copies[num])
+        return download_html(html, local_name)
 
-def check_tags(tag, condition):
-    def wrapper(function):
-        def inner(doc):
-            soup = BeautifulSoup(doc, 'html.parser')
-            
-def save_pics(html_doc, dir):
-    soup = BeautifulSoup(html_doc, 'html.parser')
-    for link in soup.find_all('img'):
+
+def parse_url(url, dir=os.getcwd()):
+    obj = urlparse(url)
+    (name, ext) = os.path.splitext(obj.path)
+    ext = ext or '.html'
+    host = obj.hostname or ''
+    name = os.path.join(dir, normalize(host + name)) + ext
+    return host, name
+
+# ----------- utils
+def normalize(src):
+    parts = re.split(r';|_|-|/|\.', src)
+    return '-'.join(parts).strip('-')
+
+
+def find_images(html):
+    images = []
+    for link in html.find_all('img'):
         src = link.get('src')
-        (filename, extension) = os.path.splitext(src)
-        if extension[1:] in VALID_EXTENSIONS:
-            picture = requests.get(src)
-            local_name = os.path.join(dir, get_file_name(filename) + extension)
-            with open(local_name, 'wb') as pic:
-                pic.write(picture.content)
-            soup.replace(src, local_name)
-        return soup.prettify()
+        (_, extension) = os.path.splitext(src)
+        if extension[1:] in VALID_IMG_EXTENSIONS:
+            images.append(src)
+    return images
+
+
+def localize_src(list, dir):
+    locals = []
+    for element in list:
+        _, name = parse_url(element, dir)
+        locals.append(name)
+    return locals
+
+
+def download_images(origins, locals):
+    for num, path in enumerate(locals):
+        image = requests.get(origins[num])
+        with open(path, 'wb') as copy:
+            copy.write(image.content)
 
 
 def download_html(html, path):
