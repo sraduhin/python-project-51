@@ -4,6 +4,9 @@ install:
 build:
 	poetry build
 
+compile:
+	poetry run page-loader https://ru.hexlet.io/courses -o var\\tmp
+
 package-install:
 	python3 -m pip install --user dist/*.whl
 

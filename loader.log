@@ -1,0 +1,12 @@
+INFO:root:Loader has been started
+INFO:root:loader has been started
+INFO:root:loader has been started
+INFO:root:loader has been started
+INFO:root:success response. Status code: 200
+INFO:root:1 images found. Downloading...
+INFO:root:success!
+INFO:root:3 assets found. Downloading...
+INFO:root:success!
+INFO:root:success!
+INFO:root:success!
+INFO:root:html page has been successfully downloaded to var\tmp/ru-hexlet-io-courses.html

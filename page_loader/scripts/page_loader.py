@@ -5,6 +5,7 @@ import os
 from page_loader import main as loader
 
 
+
 def main():
     parser = argparse.ArgumentParser(
         description='HTML-page downloader'
