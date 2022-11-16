@@ -1,10 +1,14 @@
 import requests
 import os
 import re
+import sys
 import logging
 from urllib.parse import urlparse
+from requests.exceptions import HTTPError
 
 VALID_IMG_EXTENSIONS = ['png', 'jpg']
+
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
 
 def get_host_and_create_local_name(url, dir=os.getcwd()):
@@ -14,6 +18,19 @@ def get_host_and_create_local_name(url, dir=os.getcwd()):
     host = obj.hostname or ''
     name = os.path.join(dir, normalize(host + name)) + ext
     return host, name
+
+def get_url(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except HTTPError as http_err:
+        logging.warning(f'HTTP error occurred: {http_err}')
+        sys.exit(1)
+    except Exception as err:
+        logging.warning(f'Other error occurred: {err}')
+        sys.exit(1)
+    else:
+        return response
 
 
 def normalize(src):
@@ -59,13 +76,15 @@ def localize_src(list, dir):
 
 
 def download_file(origin_path, copy_path, images=False):
-    response = requests.get(origin_path)
+    response = get_url(origin_path)
     if images:
         with open(copy_path, 'wb') as copy:
             copy.write(response.content)
     else:
         with open(copy_path, 'w', encoding='utf-8') as copy:
             copy.write(response.text)
+    logging.info(f'success download to {copy_path}')
+        
 
 
 def download_html(html, path):

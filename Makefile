@@ -4,6 +4,7 @@ install:
 build:
 	poetry build
 
+#delete this
 compile:
 	poetry run page-loader https://ru.hexlet.io/courses -o var\\tmp
 
