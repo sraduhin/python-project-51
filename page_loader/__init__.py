@@ -1,3 +1,3 @@
-from page_loader.downloader import main
+from page_loader.downloader import main as download
 
-__all__ = ['main']
+__all__ = ['download']

@@ -19,6 +19,7 @@ def get_host_and_create_local_name(url, dir=os.getcwd()):
     name = os.path.join(dir, normalize(host + name)) + ext
     return host, name
 
+
 def get_url(url):
     try:
         response = requests.get(url)
@@ -65,7 +66,7 @@ def find_scripts(html):
         if src:
             scripts.append(src)
     return scripts
-        
+
 
 def localize_src(list, dir):
     locals = []
@@ -75,16 +76,15 @@ def localize_src(list, dir):
     return locals
 
 
-def download_file(origin_path, copy_path, images=False):
+def download_file(origin_path, copy_path, image=False):
     response = get_url(origin_path)
-    if images:
+    if image:
         with open(copy_path, 'wb') as copy:
             copy.write(response.content)
     else:
         with open(copy_path, 'w', encoding='utf-8') as copy:
             copy.write(response.text)
-    logging.info(f'success download to {copy_path}')
-        
+    logging.debug(f'success download to {copy_path}')
 
 
 def download_html(html, path):
