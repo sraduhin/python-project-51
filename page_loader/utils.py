@@ -21,22 +21,14 @@ def get_host_and_create_local_name(url, dir=os.getcwd()):
 
 
 def get_url(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except HTTPError as http_err:
-        logging.warning(f'HTTP error occurred: {http_err}')
-        sys.exit(1)
-    except Exception as err:
-        logging.warning(f'Other error occurred: {err}')
-        sys.exit(1)
-    else:
-        return response
+    response = requests.get(url)
+    response.raise_for_status()
+    return response
 
 
 def normalize(src):
     parts = re.split(r';|_|-|/|\.', src)
-    return '-'.join(parts).strip('-')
+    return '-'.join(parts).strip('-.').replace('--', '-')
 
 
 def find_images(html):

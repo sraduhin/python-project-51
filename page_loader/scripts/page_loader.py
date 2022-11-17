@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import argparse
 import os
-
+import logging
+import sys
 from page_loader import download
+
 
 
 def main():
@@ -14,7 +16,11 @@ def main():
         '-o', '--output', help='download path', default=os.getcwd()
     )
     args = parser.parse_args()
-    print(download(args.url, args.output))
+    try:
+        download(args.url, args.output)
+    except Exception as err:
+        logging.error(f'Error occurred: {err}')
+        sys.exit(1)
 
 
 if __name__ == '__main__':
