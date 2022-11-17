@@ -48,36 +48,20 @@ def find_images(html):
             images.append(src)
     return images
 
-'''
-def find_links(html, localhost):
-    links = []
-    for tagline in html.find_all('link'):
-        href = tagline.get('href')
-        originhost = urlparse(href).hostname
-        if not originhost or originhost == localhost:
-            links.append(href)
-    return links
-
-
-def find_scripts(html):
-    scripts = []
-    for tagline in html.find_all('script'):
-        src = tagline.get('src')
-        if src:
-            scripts.append(src)
-    return scripts'''
-
 
 def find_assets(html, localhost=None):
     assets = []
-    assets_links = html.find_all(['script', 'link']):
+    assets_links = html.find_all(['script', 'link'])
     for link in assets_links:
-        src = link.get('href') or link.get('src')
-        if localhost:
-            originhost = urlparse(src).hostname
+        href = link.get('href')
+        if localhost and href:
+            originhost = urlparse(href).hostname
             if originhost and originhost != localhost:
                 continue
-        assets.append(src)
+            assets.append(href)
+        src = link.get('src')
+        if src:
+            assets.append(src)
     return assets
 
 

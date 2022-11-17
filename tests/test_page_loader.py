@@ -9,11 +9,9 @@ from page_loader.utils import (
     download_file,
     download_html,
     find_images,
-    find_links,
-    find_scripts,
+    find_assets,
     get_host_and_create_local_name,
     get_url,
-    localize_src,
     normalize,
 )
 from page_loader import download
@@ -79,28 +77,33 @@ def test_find_images():
         assert find_images(soup) == result
 
 
-def test_find_links():
+def test_find_assets():
     host = 'ru.hexlet.io'
     result = [
         "/assets/application.css",
         "https://ru.hexlet.io/styles/application.css",
         "/courses",
+        "https://js.stripe.com/v3/",
+        "https://ru.hexlet.io/packs/js/runtime.js",
     ]
     with open(FIXTURES_HTML, 'r', encoding='utf-8') as f:
         f = f.read()
         soup = BeautifulSoup(f, 'html.parser')
-        print(find_links(soup, host))
-        print(result)
-        assert find_links(soup, host) == result
-'''
-def test_download(requests_mock):
+        expected = find_assets(soup, host)
+        assert sorted(expected) == sorted(result)
+
+
+def test_download_html():
     fixture_path_dir = FIXTURES_DIR.split('/')
     fixture_path_file = pathlib.Path(*fixture_path_dir, 'source.html')
     with open(fixture_path_file, 'r', encoding="utf-8") as expected:
         expected = expected.read()
-        requests_mock.get(URL, text=expected)
+        print('expected>>>')
+        print(expected)
         with tempfile.TemporaryDirectory() as tempdir:
-            test_path_file = download(URL, tempdir)
+            test_path_file = download_html(expected, tempdir)
             with open(test_path_file, 'r', encoding="utf-8") as tested:
                 tested = tested.read()
-                assert expected == tested'''
+                print('tested>>>')
+                print(tested)
+                assert expected == tested

@@ -7,9 +7,8 @@ from progress.bar import IncrementalBar
 from page_loader.utils import (
     download_file,
     download_html,
+    find_assets,
     find_images,
-    find_links,
-    find_scripts,
     get_host_and_create_local_name,
     get_url,
     localize_src,
@@ -27,8 +26,7 @@ def main(url, dir):
     html = html_soup.prettify()
     origins = find_images(html_soup)
     images_link_count = len(origins)
-    origins.extend(find_links(html_soup, host))
-    origins.extend(find_scripts(html_soup))
+    origins.extend(find_assets(html_soup, host))
     if origins:
         os.makedirs(local_dir, exist_ok=True)
         copies = localize_src(origins, local_dir)
