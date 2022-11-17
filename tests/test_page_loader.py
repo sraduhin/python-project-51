@@ -3,11 +3,24 @@ import tempfile
 import os
 import pytest
 
-from page_loader.utils import get_url, get_host_and_create_local_name, normalize
+from bs4 import BeautifulSoup
+
+from page_loader.utils import (
+    download_file,
+    download_html,
+    find_images,
+    find_links,
+    find_scripts,
+    get_host_and_create_local_name,
+    get_url,
+    localize_src,
+    normalize,
+)
 from page_loader import download
 from urllib.parse import urlparse
 
 FIXTURES_DIR = 'tests/fixtures/expected'
+FIXTURES_HTML = os.path.join(FIXTURES_DIR, 'source.html')
 URL = 'https://ru.someurl.io/n_a.me/to-l_.oc/al-'
 
 
@@ -55,7 +68,30 @@ def test_get_host_and_create_local_name():
             assert tested == expected
 
 
+def test_find_images():
+    result = [
+        "/assets/professions/nodejs.png",
+        "/assets/professions/nodejs.jpg",
+    ]
+    with open(FIXTURES_HTML, 'r', encoding='utf-8') as f:
+        f = f.read()
+        soup = BeautifulSoup(f, 'html.parser')
+        assert find_images(soup) == result
 
+
+def test_find_links():
+    host = 'ru.hexlet.io'
+    result = [
+        "/assets/application.css",
+        "https://ru.hexlet.io/styles/application.css",
+        "/courses",
+    ]
+    with open(FIXTURES_HTML, 'r', encoding='utf-8') as f:
+        f = f.read()
+        soup = BeautifulSoup(f, 'html.parser')
+        print(find_links(soup, host))
+        print(result)
+        assert find_links(soup, host) == result
 '''
 def test_download(requests_mock):
     fixture_path_dir = FIXTURES_DIR.split('/')

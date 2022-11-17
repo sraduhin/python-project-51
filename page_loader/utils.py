@@ -20,15 +20,23 @@ def get_host_and_create_local_name(url, dir=os.getcwd()):
     return host, name
 
 
-def get_url(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    return response
+def localize_src(list, dir):
+    locals = []
+    for element in list:
+        _, name = get_host_and_create_local_name(element, dir)
+        locals.append(name)
+    return locals
 
 
 def normalize(src):
     parts = re.split(r';|_|-|/|\.', src)
     return '-'.join(parts).strip('-.').replace('--', '-')
+
+
+def get_url(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    return response
 
 
 def find_images(html):
@@ -40,7 +48,7 @@ def find_images(html):
             images.append(src)
     return images
 
-
+'''
 def find_links(html, localhost):
     links = []
     for tagline in html.find_all('link'):
@@ -57,15 +65,20 @@ def find_scripts(html):
         src = tagline.get('src')
         if src:
             scripts.append(src)
-    return scripts
+    return scripts'''
 
 
-def localize_src(list, dir):
-    locals = []
-    for element in list:
-        _, name = get_host_and_create_local_name(element, dir)
-        locals.append(name)
-    return locals
+def find_assets(html, localhost=None):
+    assets = []
+    assets_links = html.find_all(['script', 'link']):
+    for link in assets_links:
+        src = link.get('href') or link.get('src')
+        if localhost:
+            originhost = urlparse(src).hostname
+            if originhost and originhost != localhost:
+                continue
+        assets.append(src)
+    return assets
 
 
 def download_file(origin_path, copy_path, image=False):

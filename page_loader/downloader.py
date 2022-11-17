@@ -23,7 +23,7 @@ def main(url, dir):
     response = get_url(url)
     html_soup = BeautifulSoup(response.text, 'html.parser')
     host, local_name = get_host_and_create_local_name(url, dir)
-    local_dir = local_name.replace('.html', '-files')
+    local_dir = local_name.replace('.html', '_files')
     html = html_soup.prettify()
     origins = find_images(html_soup)
     images_link_count = len(origins)
