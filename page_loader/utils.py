@@ -15,20 +15,18 @@ def get_host_and_create_local_name(url, dir=os.getcwd()):
     ext = ext or '.html'
     host = obj.hostname or ''
     name = os.path.join(dir, normalize(host + name)) + ext
-    return host, scheme, name
+    return host, name
 
 
 def parse_url(url, dir=os.getcwd()):
-    data = {}
+    urls = {}
     obj = urlparse(url)
+    urls['host'] = obj.hostname or ''
+    urls['scheme'] = obj.scheme or ''
     name, ext = os.path.splitext(obj.path)
-    data['extension'] = ext or '.html'
-    data['name'] = os.path.join(dir, normalize(host + name)) + ext
-    if obj.hostname:
-        data['host'] = obj.hostname
-    if obj.scheme:
-        data['scheme'] = obj.scheme
-    return data
+    urls['extension'] = ext or '.html'
+    urls['name'] = os.path.join(dir, normalize(data['host'] + name)) + ext
+    return urls
 
 
 def localize_src(list, dir):
@@ -76,7 +74,7 @@ def find_assets(html, localhost=None):
     return assets
 
 
-def download_file(origin_path, copy_path, image=False, host=False, scheme):
+def download_file(origin_path, copy_path, image=False, host=False, data):
     print('>>>', host)
     if host:
         origin_path = host + origin_path
