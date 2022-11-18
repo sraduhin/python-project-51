@@ -1,10 +1,8 @@
 import requests
 import os
 import re
-import sys
 import logging
 from urllib.parse import urlparse
-from requests.exceptions import HTTPError
 
 VALID_IMG_EXTENSIONS = ['png', 'jpg']
 
@@ -17,7 +15,20 @@ def get_host_and_create_local_name(url, dir=os.getcwd()):
     ext = ext or '.html'
     host = obj.hostname or ''
     name = os.path.join(dir, normalize(host + name)) + ext
-    return host, name
+    return host, scheme, name
+
+
+def parse_url(url, dir=os.getcwd()):
+    data = {}
+    obj = urlparse(url)
+    name, ext = os.path.splitext(obj.path)
+    data['extension'] = ext or '.html'
+    data['name'] = os.path.join(dir, normalize(host + name)) + ext
+    if obj.hostname:
+        data['host'] = obj.hostname
+    if obj.scheme:
+        data['scheme'] = obj.scheme
+    return data
 
 
 def localize_src(list, dir):
@@ -65,7 +76,11 @@ def find_assets(html, localhost=None):
     return assets
 
 
-def download_file(origin_path, copy_path, image=False):
+def download_file(origin_path, copy_path, image=False, host=False, scheme):
+    print('>>>', host)
+    if host:
+        origin_path = host + origin_path
+    print('>>>', origin_path)
     response = get_url(origin_path)
     if image:
         with open(copy_path, 'wb') as copy:
@@ -80,4 +95,3 @@ def download_html(html, path):
     with open(path, 'w', encoding='utf-8') as f:
         f.write(html)
         logging.info(f'html page has been successfully downloaded to {path}')
-        return path

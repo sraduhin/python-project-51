@@ -6,7 +6,7 @@ build:
 
 #delete this
 compile:
-	poetry run page-loader https://5ru.hexlet.io/courses -o var\\tmp
+	poetry run page-loader https://page-loader.hexlet.repl.co/ -o var\\tmp
 
 package-install:
 	python3 -m pip install --user dist/*.whl
