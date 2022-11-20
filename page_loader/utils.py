@@ -4,37 +4,39 @@ import re
 import logging
 from urllib.parse import urlparse
 
-VALID_IMG_EXTENSIONS = ['png', 'jpg']
+VALID_IMG_EXTENSIONS = ['.png', '.jpg']
 
-logging.basicConfig(encoding='utf-8', level=logging.INFO)
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 
-def get_host_and_create_local_name(url, dir=os.getcwd()):
+def parse_url(url):
+    parts = {}
     obj = urlparse(url)
-    (name, ext) = os.path.splitext(obj.path)
-    ext = ext or '.html'
-    host = obj.hostname or ''
-    name = os.path.join(dir, normalize(host + name)) + ext
-    return host, name
+    parts['host'] = obj.hostname
+    parts['scheme'] = obj.scheme
+    parts['path'] = obj.path
+    parts['name'], parts['extension'] = os.path.splitext(parts['path'])
+    return parts
 
 
-def parse_url(url, dir=os.getcwd()):
-    urls = {}
-    obj = urlparse(url)
-    urls['host'] = obj.hostname or ''
-    urls['scheme'] = obj.scheme or ''
-    name, ext = os.path.splitext(obj.path)
-    urls['extension'] = ext or '.html'
-    urls['name'] = os.path.join(dir, normalize(data['host'] + name)) + ext
-    return urls
+def create_local_name(url, dir, parent=None):
+    url_parts = parse_url(url)
+    extension = url_parts['extension'] or '.html'
+    host = url_parts['host']
+    if not host:
+        host = parse_url(parent)['host']
+    name = normalize(host + url_parts['name'])
+    name += extension
+    name = os.path.join(dir, name)
+    return name
 
 
-def localize_src(list, dir):
-    locals = []
-    for element in list:
-        _, name = get_host_and_create_local_name(element, dir)
-        locals.append(name)
-    return locals
+def normalize_link(link, parent):
+    link_obj = parse_url(link)
+    if not link_obj['scheme']:
+        parents = parse_url(parent)
+        link = f"{parents['scheme']}://{parents['host']}/{link}"
+    return link
 
 
 def normalize(src):
@@ -42,7 +44,7 @@ def normalize(src):
     return '-'.join(parts).strip('-.').replace('--', '-')
 
 
-def get_url(url):
+def get_html(url):
     response = requests.get(url)
     response.raise_for_status()
     return response
@@ -52,34 +54,42 @@ def find_images(html):
     images = []
     for link in html.find_all('img'):
         src = link.get('src')
-        (_, extension) = os.path.splitext(src)
-        if extension[1:] in VALID_IMG_EXTENSIONS:
-            images.append(src)
+        if src:
+            src_parts = parse_url(src)
+            if src_parts['extension'] in VALID_IMG_EXTENSIONS:
+                logging.debug(f'found image {src}')
+                images.append(src)
     return images
 
 
-def find_assets(html, localhost=None):
-    assets = []
-    assets_links = html.find_all(['script', 'link'])
-    for link in assets_links:
+def find_links(html, parent):
+    links = []
+    for link in html.find_all('link'):
         href = link.get('href')
-        if localhost and href:
-            originhost = urlparse(href).hostname
-            if originhost and originhost != localhost:
+        if href:
+            href_parts = parse_url(href)
+            if href_parts['host']:
+                if href_parts['host'] == parent['host']:
+                    logging.debug(f'found link {href}')
+                    links.append(href)
                 continue
-            assets.append(href)
+            links.append(href)
+    return links
+
+
+def find_scripts(html):
+    scripts = []
+    for link in html.find_all('script'):
         src = link.get('src')
         if src:
-            assets.append(src)
-    return assets
+            logging.debug(f'found script {src}')
+            scripts.append(src)
+    return scripts
 
 
-def download_file(origin_path, copy_path, image=False, host=False, data):
-    print('>>>', host)
-    if host:
-        origin_path = host + origin_path
-    print('>>>', origin_path)
-    response = get_url(origin_path)
+def download_file(origin_path, copy_path, image=False):
+    logging.debug(f'downloading {origin_path}')
+    response = get_html(origin_path)
     if image:
         with open(copy_path, 'wb') as copy:
             copy.write(response.content)
@@ -90,6 +100,7 @@ def download_file(origin_path, copy_path, image=False, host=False, data):
 
 
 def download_html(html, path):
+    logging.debug(f'downloading html page to {path}')
     with open(path, 'w', encoding='utf-8') as f:
         f.write(html)
         logging.info(f'html page has been successfully downloaded to {path}')
