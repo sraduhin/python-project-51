@@ -44,4 +44,5 @@ def main(url, dir):
                 logging.debug(f"{path} saved with new local name {local_file_name}")
                 bar.next()
     download_html(html, local_name)
+    print(html)
     return local_name
