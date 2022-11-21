@@ -42,4 +42,5 @@ def main(url, dir):
                     download_file(path, local_file_name)
                 html = html.replace(path, local_file_name)
                 bar.next()
-    return download_html(html, local_name)
+    download_html(html, local_name)
+    return local_name
