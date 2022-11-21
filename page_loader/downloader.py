@@ -22,6 +22,7 @@ def main(url, dir):
     logging.info(f'requested url: {url}')
     response = get_html(url)
     html = BeautifulSoup(response.text, 'html.parser')
+    print(html.prettify())  # delete
     local_name = create_local_name(url, dir)
     local_dir = local_name.replace('.html', '_files')
     images = find_images(html)
@@ -42,7 +43,3 @@ def main(url, dir):
                 html = html.replace(path, local_file_name)
                 bar.next()
     return download_html(html, local_name)
-
-
-if __name__ == '__main__':
-    main('https://ru.hexlet.io/3courses', 'var\\tmp')
