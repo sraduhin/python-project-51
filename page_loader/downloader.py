@@ -22,7 +22,6 @@ def main(url, dir):
     logging.info(f'requested url: {url}')
     response = get_html(url)
     html = BeautifulSoup(response.text, 'html.parser')
-    print(html.prettify())  # delete
     local_name = create_local_name(url, dir)
     local_dir = local_name.replace('.html', '_files')
     images = find_images(html)
@@ -34,15 +33,14 @@ def main(url, dir):
         os.makedirs(local_dir, exist_ok=True)
         with IncrementalBar('Processing', max=len(resourses)) as bar:
             for num, path in enumerate(resourses):
-                path = normalize_link(path, parent=url)
-                local_file_name = create_local_name(path, local_dir, parent=url)
+                full_path = normalize_link(path, parent=url)
+                local_file_name = create_local_name(full_path, local_dir, parent=url)
                 if num < len(images):
-                    download_file(path, local_file_name, image=True)
+                    download_file(full_path, local_file_name, image=True)
                 else:
-                    download_file(path, local_file_name)
+                    download_file(full_path, local_file_name)
                 html = html.replace(path, local_file_name)
                 logging.debug(f"{path} saved with new local name {local_file_name}")
                 bar.next()
     download_html(html, local_name)
-    print(html)
     return local_name
