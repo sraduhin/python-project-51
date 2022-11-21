@@ -81,6 +81,23 @@ def find_links(html, parent):
     return links
 
 
+def find_scripts(html, parent):
+    scripts = []
+    for link in html.find_all('script'):
+        src = link.get('src')
+        if src:
+            src_parts = parse_url(src)
+            if src_parts['host']:
+                parents = parse_url(parent)
+                if src_parts['host'] == parents['host']:
+                    logging.debug(f'found link {src}')
+                    scripts.append(src)
+                continue
+            scripts.append(src)
+    return scripts
+
+
+'''
 def find_scripts(html):
     scripts = []
     for link in html.find_all('script'):
@@ -88,7 +105,7 @@ def find_scripts(html):
         if src:
             logging.debug(f'found script {src}')
             scripts.append(src)
-    return scripts
+    return scripts'''
 
 
 def download_file(origin_path, download_path, image=False):

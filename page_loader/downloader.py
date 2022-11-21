@@ -27,7 +27,7 @@ def main(url, dir):
     local_dir = local_name.replace('.html', '_files')
     images = find_images(html)
     links = find_links(html, parent=url)
-    scripts = find_scripts(html)
+    scripts = find_scripts(html, parent=url)
     resourses = images + links + scripts
     html = html.prettify()
     if resourses:
