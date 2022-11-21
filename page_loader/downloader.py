@@ -34,7 +34,7 @@ def main(url, dir):
         with IncrementalBar('Processing', max=len(resourses)) as bar:
             for num, path in enumerate(resourses):
                 path = normalize_link(path, parent=url)
-                local_file_name = create_local_name(path, dir, parent=url)
+                local_file_name = create_local_name(path, local_dir, parent=url)
                 if num < len(images):
                     download_file(path, local_file_name, image=True)
                 else:

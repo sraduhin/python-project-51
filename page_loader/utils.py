@@ -24,7 +24,10 @@ def create_local_name(url, dir, parent=None):
     extension = url_parts['extension'] or '.html'
     host = url_parts['host']
     if not host:
-        host = parse_url(parent)['host']
+        try:
+            host = parse_url(parent)['host']
+        except logging.error('invalid or missing parent argument'):
+            pass
     name = normalize(host + url_parts['name'])
     name += extension
     name = os.path.join(dir, name)
@@ -69,7 +72,8 @@ def find_links(html, parent):
         if href:
             href_parts = parse_url(href)
             if href_parts['host']:
-                if href_parts['host'] == parent['host']:
+                parents = parse_url(parent)
+                if href_parts['host'] == parents['host']:
                     logging.debug(f'found link {href}')
                     links.append(href)
                 continue
@@ -87,16 +91,16 @@ def find_scripts(html):
     return scripts
 
 
-def download_file(origin_path, copy_path, image=False):
+def download_file(origin_path, download_path, image=False):
     logging.debug(f'downloading {origin_path}')
     response = get_html(origin_path)
     if image:
-        with open(copy_path, 'wb') as copy:
+        with open(download_path, 'wb') as copy:
             copy.write(response.content)
     else:
-        with open(copy_path, 'w', encoding='utf-8') as copy:
+        with open(download_path, 'w', encoding='utf-8') as copy:
             copy.write(response.text)
-    logging.debug(f'success download to {copy_path}')
+    logging.debug(f'success download to {download_path}')
 
 
 def download_html(html, path):

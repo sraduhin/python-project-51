@@ -15,12 +15,11 @@ def main():
         '-o', '--output', help='download path', default=os.getcwd()
     )
     args = parser.parse_args()
-    download(args.url, args.output)
-    '''try:
+    try:
         download(args.url, args.output)
     except Exception as err:
         logging.error(f'Error occurred: {err}')
-        sys.exit(1)'''
+        sys.exit(1)
 
 
 if __name__ == '__main__':
