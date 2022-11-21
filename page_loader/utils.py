@@ -38,7 +38,7 @@ def normalize_link(link, parent):
     link_obj = parse_url(link)
     if not link_obj['scheme']:
         parents = parse_url(parent)
-        link = f"{parents['scheme']}://{parents['host']}{parents['name']}/{link}"
+        link = f"{parents['scheme']}://{parents['host']}{parents['name']}{link}"
     return link
 
 
