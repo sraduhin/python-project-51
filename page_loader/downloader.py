@@ -41,6 +41,7 @@ def main(url, dir):
                 else:
                     download_file(path, local_file_name)
                 html = html.replace(path, local_file_name)
+                logging.debug(f"{path} saved with new local name {local_file_name}")
                 bar.next()
     download_html(html, local_name)
     return local_name
