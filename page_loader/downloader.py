@@ -34,11 +34,11 @@ def main(url, dir):
         with IncrementalBar('Processing', max=len(resourses)) as bar:
             for num, path in enumerate(resourses):
                 full_path = normalize_link(path, parent=url)
-                local_file_name = create_local_name(full_path, local_dir, parent=url)
+                local_file_name = create_local_name(full_path, parent=url)
                 if num < len(images):
-                    download_file(full_path, local_file_name, image=True)
+                    download_file(full_path, os.path.join(dir, local_file_name), image=True)
                 else:
-                    download_file(full_path, local_file_name)
+                    download_file(full_path, os.path.join(dir, local_file_name))
                 html = html.replace(path, local_file_name)
                 logging.debug(f"{path} saved with new local name {local_file_name}")
                 bar.next()

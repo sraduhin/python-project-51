@@ -15,7 +15,6 @@ def main():
         '-o', '--output', help='download path', default=os.getcwd()
     )
     args = parser.parse_args()
-    download(args.url, args.output)
     try:
         download(args.url, args.output)
     except Exception as err:

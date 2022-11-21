@@ -19,7 +19,7 @@ def parse_url(url):
     return parts
 
 
-def create_local_name(url, dir, parent=None):
+def create_local_name(url, dir='/', parent=None):
     url_parts = parse_url(url)
     extension = url_parts['extension'] or '.html'
     host = url_parts['host']
