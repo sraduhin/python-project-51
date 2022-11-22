@@ -19,25 +19,31 @@ logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 def main(url, dir):
     logging.info(f'requested url: {url}')
+
     if not os.path.isdir(dir):
         logging.error(f'{dir} doesnt exist')
+
     response = get_html(url)
     html = BeautifulSoup(response.text, 'html.parser')
+
     local_page_name = create_local_name(url)
     local_dir = local_page_name.replace('.html', '_files')
+
     images = find_images(html)
     assets = find_assets(html, parent=url)
     resourses = images + assets
     html = html.prettify()
+
     if resourses:
-        #  os.makedirs(os.path.join(dir, local_dir), exist_ok=True)
-        
+        os.makedirs(os.path.join(dir, local_dir), exist_ok=True)
+
         with IncrementalBar('Processing', max=len(resourses)) as bar:
-            for num, path in enumerate(resourses):
+            for path in resourses:
                 full_origin_path = normalize_link(path, parent=url)
                 local_file_name = create_local_name(full_origin_path)
                 relative_local_path = os.path.join(local_dir, local_file_name)
                 absolut_local_path = os.path.join(dir, relative_local_path)
+
                 download_file(full_origin_path, absolut_local_path)
                 html = html.replace(path, relative_local_path)
                 logging.debug(
