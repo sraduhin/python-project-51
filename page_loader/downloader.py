@@ -22,7 +22,7 @@ def main(url, dir):
     logging.info(f'requested url: {url}')
 
     if not os.path.isdir(dir):
-        raise FileNotFoundError(logging.error(f'{dir} doesnt exist'))
+        raise FileNotFoundError(f'{dir} doesnt exist')
 
     response = get_html(url)
     html = BeautifulSoup(response.text, 'html.parser')
