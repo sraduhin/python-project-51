@@ -34,7 +34,7 @@ def main(url, dir):
                 full_origin_path = normalize_link(path, parent=url)
                 local_file_name = create_local_name(full_origin_path)
                 relative_local_path = os.path.join(local_dir, local_file_name)
-                image_type = [True, False][num < len(images)]
+                image_type = [False, True][num < len(images)]
                 absolut_local_path = os.path.join(dir, relative_local_path)
                 download_file(full_origin_path, absolut_local_path, image_type)
                 html = html.replace(path, relative_local_path)
