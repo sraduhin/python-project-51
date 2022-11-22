@@ -1,6 +1,7 @@
 import pathlib
 import tempfile
 import os
+import re
 import pytest
 
 from bs4 import BeautifulSoup
@@ -14,6 +15,7 @@ from page_loader.utils import (
     find_assets,
     get_html,
     normalize,
+    normalize_link,
 )
 
 from page_loader import download
@@ -39,27 +41,30 @@ def test_create_local_name():
     urls = [
         'http://host/path_page',
         'https://host/path_page.ext',
-        '/relative/path_page.ext'
     ]
-    dirs = [
-        os.getcwd(),
-        FIXTURES_DIR,
-    ]
-    parent = 'https://parent.host.io/parent-path.page'
     expected = [
-        os.path.join(os.getcwd(), 'host-path-page.html'),
-        os.path.join(FIXTURES_DIR, 'host-path-page.html'),
-        os.path.join(os.getcwd(), 'host-path-page.ext'),
-        os.path.join(FIXTURES_DIR, 'host-path-page.ext'),
-        os.path.join(os.getcwd(), 'parent-host-io-relative-path-page.ext'),
-        os.path.join(FIXTURES_DIR, 'parent-host-io-relative-path-page.ext'),
+        os.path.join('host-path-page.html'),
+        os.path.join('host-path-page.ext'),
     ]
     tested = []
     for url in urls:
-        for dir in dirs:
-            tested.append(create_local_name(url, dir, parent))
+        tested.append(create_local_name(url))
     print(tested)
     assert expected == tested
+
+
+def test_normalize_link():
+    links = [
+        '/relative/link.li',
+        'https://absolut/link.li',
+    ]
+    pattern = '(?<=[a-zA-Z0-9])/.*$'
+    expected = [
+        f"{re.sub(pattern, '', URL)}{links[0]}",
+        f'{links[1]}',
+    ]
+    for num, link in enumerate(links):
+        assert normalize_link(link, URL) == expected[num]
 
 
 def test_get_url(requests_mock, get_html_doc):

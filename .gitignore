@@ -24,3 +24,6 @@ nosetests.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+
+#mynotes
+notes.py

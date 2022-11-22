@@ -19,18 +19,12 @@ def parse_url(url):
     return parts
 
 
-def create_local_name(url, dir='', parent=None):
+def create_local_name(url):
     url_parts = parse_url(url)
     extension = url_parts['extension'] or '.html'
     host = url_parts['host']
-    if not host:
-        try:
-            host = parse_url(parent)['host']
-        except logging.error('invalid or missing parent argument'):
-            pass
     name = normalize(host + url_parts['name'])
     name += extension
-    name = os.path.join(dir, name)
     return name
 
 

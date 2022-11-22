@@ -21,25 +21,28 @@ def main(url, dir):
     logging.info(f'requested url: {url}')
     response = get_html(url)
     html = BeautifulSoup(response.text, 'html.parser')
-    local_name = create_local_name(url, dir)
-    local_dir = local_name.replace('.html', '_files')
+    local_page_name = create_local_name(url)
+    local_dir = local_page_name.replace('.html', '_files')
     images = find_images(html)
     assets = find_assets(html, parent=url)
     resourses = images + assets
     html = html.prettify()
     if resourses:
-        os.makedirs(local_dir, exist_ok=True)
+        os.makedirs(os.path.join(dir, local_dir), exist_ok=True)
         with IncrementalBar('Processing', max=len(resourses)) as bar:
             for num, path in enumerate(resourses):
-                full_path = normalize_link(path, parent=url)
-                local_file_name = create_local_name(full_path, parent=url)
+                full_origin_path = normalize_link(path, parent=url)
+                local_file_name = create_local_name(full_origin_path)
+                relative_local_path = os.path.join(local_dir, local_file_name)
                 image_type = [True, False][num < len(images)]
-                download_path = os.path.join(local_dir, local_file_name)
-                download_file(full_path, download_path, image_type)
-                html = html.replace(path, local_file_name)
+                absolut_local_path = os.path.join(dir, relative_local_path)
+                download_file(full_origin_path, absolut_local_path, image_type)
+                html = html.replace(path, relative_local_path)
                 logging.debug(
                     f"{path} saved with new local name {local_file_name}"
                 )
                 bar.next()
-    download_html(html, local_name)
-    return local_name
+
+    absolut_page_path = os.path.join(dir, local_page_name)
+    download_html(html, absolut_page_path)
+    return local_page_name
