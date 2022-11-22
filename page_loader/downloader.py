@@ -1,6 +1,7 @@
 import os
 import logging
 
+
 from bs4 import BeautifulSoup
 from progress.bar import IncrementalBar
 
@@ -21,7 +22,7 @@ def main(url, dir):
     logging.info(f'requested url: {url}')
 
     if not os.path.isdir(dir):
-        logging.error(f'{dir} doesnt exist')
+        raise FileNotFoundError(logging.error(f'{dir} doesnt exist'))
 
     response = get_html(url)
     html = BeautifulSoup(response.text, 'html.parser')
