@@ -108,7 +108,7 @@ def test_download_img(requests_mock):
         requests_mock.get(URL, content=expected)
         with tempfile.TemporaryDirectory() as tempdir:
             temp_file = os.path.join(tempdir, 'temp')
-            download_file(URL, temp_file, image=True)
+            download_file(URL, temp_file)
             with open(temp_file, 'rb') as tested:
                 tested = tested.read()
                 assert expected == tested

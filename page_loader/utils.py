@@ -76,15 +76,11 @@ def find_assets(html, parent):
     return assets
 
 
-def download_file(origin_path, download_path, image=False):
+def download_file(origin_path, download_path):
     logging.debug(f'downloading {origin_path}')
     response = get_html(origin_path)
-    if image:
-        with open(download_path, 'wb') as copy:
-            copy.write(response.content)
-    else:
-        with open(download_path, 'wb') as copy:
-            copy.write(response.content)
+    with open(download_path, 'wb') as copy:
+        copy.write(response.content)
     logging.debug(f'success download to {download_path}')
 
 
