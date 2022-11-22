@@ -6,7 +6,7 @@ build:
 
 #delete this
 compile:
-	poetry run page-loader https://page-loader.hexlet.repl.co/ -o var\\tmp\notEx
+	poetry run page-loader https://page-loader.hexlet.repl.co/
 
 package-install:
 	python3 -m pip install --user dist/*.whl

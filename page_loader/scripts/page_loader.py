@@ -16,7 +16,7 @@ def main():
     )
     args = parser.parse_args()
     try:
-        download(args.url, args.output)
+        print(download(args.url, args.output))
     except Exception as err:
         logging.error(f'Error occurred: {err}')
         return sys.exit(1)
