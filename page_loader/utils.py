@@ -2,7 +2,6 @@ import requests
 import os
 import re
 import logging
-from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 
 VALID_IMG_EXTENSIONS = ['.png', '.jpg']
