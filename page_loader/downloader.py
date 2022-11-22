@@ -14,7 +14,7 @@ from page_loader.utils import (
     normalize_link,
 )
 
-logging.basicConfig(encoding='utf-8', level=logging.INFO)
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 
 def main(url, dir):

@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 VALID_IMG_EXTENSIONS = ['.png', '.jpg']
 
-logging.basicConfig(encoding='utf-8', level=logging.INFO)
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 
 def parse_url(url):
