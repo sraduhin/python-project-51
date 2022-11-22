@@ -9,8 +9,7 @@ from page_loader.utils import (
     download_file,
     download_html,
     find_images,
-    find_links,
-    find_scripts,
+    find_assets,
     get_html,
     normalize_link,
 )
@@ -25,9 +24,8 @@ def main(url, dir):
     local_name = create_local_name(url, dir)
     local_dir = local_name.replace('.html', '_files')
     images = find_images(html)
-    links = find_links(html, parent=url)
-    scripts = find_scripts(html, parent=url)
-    resourses = images + links + scripts
+    assets = find_assets(html, parent=url)
+    resourses = images + assets
     html = html.prettify()
     if resourses:
         os.makedirs(local_dir, exist_ok=True)
@@ -35,12 +33,13 @@ def main(url, dir):
             for num, path in enumerate(resourses):
                 full_path = normalize_link(path, parent=url)
                 local_file_name = create_local_name(full_path, parent=url)
-                if num < len(images):
-                    download_file(full_path, os.path.join(dir, local_file_name), image=True)
-                else:
-                    download_file(full_path, os.path.join(dir, local_file_name))
+                image_type = [True, False][num < len(images)]
+                download_path = os.path.join(local_dir, local_file_name)
+                download_file(full_path, download_path, image_type)
                 html = html.replace(path, local_file_name)
-                logging.debug(f"{path} saved with new local name {local_file_name}")
+                logging.debug(
+                    f"{path} saved with new local name {local_file_name}"
+                )
                 bar.next()
     download_html(html, local_name)
     return local_name

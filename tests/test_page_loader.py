@@ -11,8 +11,7 @@ from page_loader.utils import (
     download_file,
     download_html,
     find_images,
-    find_links,
-    find_scripts,
+    find_assets,
     get_html,
     normalize,
 )
@@ -124,20 +123,11 @@ def test_find_images(get_html_soup):
     assert sorted(find_images(get_html_soup)) == sorted(expected)
 
 
-def test_find_scripts(get_html_soup):
+def test_find_assets(get_html_soup):
     expected = [
-        "https://js.stripe.com/v3/",
         "https://ru.hexlet.io/packs/js/runtime.js",
-    ]
-    assert sorted(find_scripts(get_html_soup)) == sorted(expected)
-
-
-def test_find_links(get_html_soup):
-    expected = [
         "/assets/application.css",
         "https://ru.hexlet.io/styles/application.css",
         "/courses",
     ]
-    assert sorted(find_links(get_html_soup, URL)) == sorted(expected)
-
-
+    assert sorted(find_assets(get_html_soup, URL)) == sorted(expected)

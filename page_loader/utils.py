@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 VALID_IMG_EXTENSIONS = ['.png', '.jpg']
 
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
 
 def parse_url(url):
@@ -19,7 +19,7 @@ def parse_url(url):
     return parts
 
 
-def create_local_name(url, dir='/', parent=None):
+def create_local_name(url, dir='', parent=None):
     url_parts = parse_url(url)
     extension = url_parts['extension'] or '.html'
     host = url_parts['host']
@@ -65,47 +65,20 @@ def find_images(html):
     return images
 
 
-def find_links(html, parent):
-    links = []
-    for link in html.find_all('link'):
-        href = link.get('href')
-        if href:
-            href_parts = parse_url(href)
-            if href_parts['host']:
-                parents = parse_url(parent)
-                if href_parts['host'] == parents['host']:
-                    logging.debug(f'found link {href}')
-                    links.append(href)
-                continue
-            links.append(href)
-    return links
-
-
-def find_scripts(html, parent):
-    scripts = []
-    for link in html.find_all('script'):
-        src = link.get('src')
+def find_assets(html, parent):
+    assets = []
+    for link in html.find_all(['script', 'link']):
+        src = link.get('src') or link.get('href')
         if src:
             src_parts = parse_url(src)
             if src_parts['host']:
                 parents = parse_url(parent)
                 if src_parts['host'] == parents['host']:
                     logging.debug(f'found link {src}')
-                    scripts.append(src)
+                    assets.append(src)
                 continue
-            scripts.append(src)
-    return scripts
-
-
-'''
-def find_scripts(html):
-    scripts = []
-    for link in html.find_all('script'):
-        src = link.get('src')
-        if src:
-            logging.debug(f'found script {src}')
-            scripts.append(src)
-    return scripts'''
+            assets.append(src)
+    return assets
 
 
 def download_file(origin_path, download_path, image=False):
