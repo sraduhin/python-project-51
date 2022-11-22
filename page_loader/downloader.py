@@ -18,7 +18,8 @@ from page_loader.utils import (
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 
-def main(url, dir):
+def main(url, dir, downloader=download_file,
+        media_finder=find_images, resources_finder=find_assets):
     logging.info(f'requested url: {url}')
 
     if not os.path.isdir(dir):
@@ -30,8 +31,8 @@ def main(url, dir):
     local_page_name = create_local_name(url)
     local_dir = local_page_name.replace('.html', '_files')
 
-    images = find_images(html)
-    assets = find_assets(html, parent=url)
+    images = media_finder(html)
+    assets = resources_finder(html, parent=url)
     resourses = images + assets
     html = html.prettify()
 
@@ -44,8 +45,8 @@ def main(url, dir):
                 local_file_name = create_local_name(full_origin_path)
                 relative_local_path = os.path.join(local_dir, local_file_name)
                 absolut_local_path = os.path.join(dir, relative_local_path)
-
-                download_file(full_origin_path, absolut_local_path)
+                downloader(full_origin_path, absolut_local_path)
+                # download_file(full_origin_path, absolut_local_path)
                 html = html.replace(path, relative_local_path)
                 logging.debug(
                     f"{path} saved with new local name {local_file_name}"

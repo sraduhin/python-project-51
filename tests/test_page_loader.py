@@ -36,6 +36,10 @@ def get_html_soup(get_html_doc):
     soup = BeautifulSoup(get_html_doc, 'html.parser')
     return soup
 
+# test downloader.py
+def test_download():
+    pass
+
 # test utils.py
 def test_create_local_name():
     urls = [

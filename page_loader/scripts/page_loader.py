@@ -16,10 +16,12 @@ def main():
     )
     args = parser.parse_args()
     try:
-        print(download(args.url, args.output))
+        path = download(args.url, args.output)
     except Exception as err:
         logging.error(f'Error occurred: {err}')
         return sys.exit(1)
+
+    print(path)
 
 
 if __name__ == '__main__':
