@@ -84,7 +84,7 @@ def download_file(origin_path, download_path, image=False):
             copy.write(response.content)
     else:
         with open(download_path, 'w', encoding='utf-8') as copy:
-            copy.write(f'\\xef\\xbb\\xbfh3{response.text}')
+            copy.write(f'\\xef\\xbb\\xbf{response.text}')
     logging.debug(f'success download to {download_path}')
 
 
