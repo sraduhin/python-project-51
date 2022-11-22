@@ -45,4 +45,4 @@ def main(url, dir):
 
     absolut_page_path = os.path.join(dir, local_page_name)
     download_html(html, absolut_page_path)
-    return local_page_name
+    return absolut_page_path
