@@ -83,15 +83,13 @@ def download_file(origin_path, download_path, image=False):
         with open(download_path, 'wb') as copy:
             copy.write(response.content)
     else:
-        with open(download_path, 'w') as copy:
-            content = response.text
-            content = BeautifulSoup(content, 'html.parser')
-            copy.write(content.prettify())
+        with open(download_path, 'w', encoding='utf-8') as copy:
+            copy.write(f'\\xef\\xbb\\xbfh3{response.text}')
     logging.debug(f'success download to {download_path}')
 
 
 def download_html(html, path):
     logging.debug(f'downloading html page to {path}')
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf-8') as f:
         f.write(html)
         logging.info(f'html page has been successfully downloaded to {path}')
