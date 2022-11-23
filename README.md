@@ -5,10 +5,17 @@
 <a href="https://codeclimate.com/github/sraduhin/python-project-51/test_coverage"><img src="https://api.codeclimate.com/v1/badges/341d40e6ee7d487f3675/test_coverage" /></a>
 
 ## How to install
-<code>
-1. git clone https://github.com/sraduhin/python-project-51.git
-2. cd python-project-51
-3. make install
-4. poetry shell
-5. page-loader -o DOWNLOAD_DIR PAGE_URL
-</code>
+
+<code>git clone https://github.com/sraduhin/python-project-51.git</code>
+
+<code>cd python-project-51</code>
+
+<code>make install</code>
+
+<code>poetry shell</code>
+
+<code>page-loader -o DOWNLOAD_DIR PAGE_URL</code>
+
+## How to use
+
+<code>soon</code>
