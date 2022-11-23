@@ -3,6 +3,7 @@ import logging
 
 
 from bs4 import BeautifulSoup
+# from bs4.formatter import HTMLFormatter
 from progress.bar import IncrementalBar
 
 from page_loader.utils import (
@@ -18,8 +19,7 @@ from page_loader.utils import (
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 
-def main(url, dir, downloader=download_file,
-        media_finder=find_images, resources_finder=find_assets):
+def main(url, dir, downloader=download_file):
     logging.info(f'requested url: {url}')
 
     if not os.path.isdir(dir):
@@ -31,9 +31,10 @@ def main(url, dir, downloader=download_file,
     local_page_name = create_local_name(url)
     local_dir = local_page_name.replace('.html', '_files')
 
-    images = media_finder(html)
-    assets = resources_finder(html, parent=url)
+    images = find_images(html)
+    assets = find_assets(html, parent=url)
     resourses = images + assets
+    # html = html.prettify(formatter=HTMLFormatter(indent=4))
     html = html.prettify()
 
     if resourses:

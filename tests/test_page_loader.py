@@ -22,7 +22,9 @@ from page_loader import download
 
 FIXTURES_DIR = os.path.join('tests', 'fixtures', 'expected')
 SOURCE_HTML = os.path.join(FIXTURES_DIR, 'source.html')
+RESULT_HTML = os.path.join(FIXTURES_DIR, 'result.html')
 URL = 'https://ru.hexlet.io/n_a.me/to-l_.oc/al-'
+
 
 @pytest.fixture
 def get_html_doc():
@@ -32,13 +34,37 @@ def get_html_doc():
 
 
 @pytest.fixture
+def get_html_result():
+    with open(RESULT_HTML, 'r', encoding='utf-8') as f:
+        doc = f.read()
+        doc = BeautifulSoup(doc, 'html.parser')
+    return doc.prettify()
+
+
+@pytest.fixture
 def get_html_soup(get_html_doc):
     soup = BeautifulSoup(get_html_doc, 'html.parser')
     return soup
 
-# test downloader.py
-def test_download():
+
+def fake_downloader(*_):
     pass
+
+
+# test downloader.py
+def test_download(requests_mock, get_html_doc, get_html_result):
+    url = 'https://ru.hexlet.io/courses'
+    downloader = fake_downloader
+    expected = get_html_result
+    with tempfile.TemporaryDirectory() as tempdir:
+        requests_mock.get(url, text=get_html_doc)
+        temp_file = download(url, tempdir, downloader)
+        with open(temp_file, 'r', encoding="utf-8") as tested:
+            tested = tested.read()
+            print(tested)
+            print(expected)
+            assert expected == tested
+
 
 # test utils.py
 def test_create_local_name():

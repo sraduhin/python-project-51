@@ -4,15 +4,11 @@ install:
 build:
 	poetry build
 
-#delete this
-compile:
-	poetry run page-loader https://page-loader.hexlet.repl.co/
-
 package-install:
 	python3 -m pip install --user dist/*.whl
 
 lint:
-	poetry run flake8 page_loader, tests
+	poetry run flake8 page_loader tests
 
 test:
 	poetry run pytest
