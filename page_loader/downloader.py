@@ -10,23 +10,23 @@ from page_loader.utils import (
     create_local_name,
     download_file,
     download_html,
-    find_images,
-    find_assets,
-    get_html,
+    get_url_content,
     normalize_link,
 )
+from page_loader.resources import get_locals
 
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 
-def main(url, dir, downloader=download_file):
+def download(url, dir, downloader=download_file):
     logging.info(f'requested url: {url}')
 
     if not os.path.isdir(dir):
         raise FileNotFoundError(f'{dir} doesnt exist')
 
-    response = get_html(url)
-    html = BeautifulSoup(response.text, 'html.parser')
+    response = get_url_content(url)
+    html, resouses_path = get_locals(response)
+    '''html = BeautifulSoup(response, 'html.parser')
 
     local_page_name = create_local_name(url)
     local_dir = local_page_name.replace('.html', '_files')
@@ -35,7 +35,7 @@ def main(url, dir, downloader=download_file):
     assets = find_assets(html, parent=url)
     resourses = images + assets
     # html = html.prettify(formatter=HTMLFormatter(indent=4))
-    html = html.prettify()
+    html = html.prettify()'''
 
     if resourses:
         os.makedirs(os.path.join(dir, local_dir), exist_ok=True)

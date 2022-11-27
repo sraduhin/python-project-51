@@ -11,12 +11,12 @@ from page_loader.utils import (
     create_local_name,
     download_file,
     download_html,
-    find_images,
-    find_assets,
-    get_html,
+    get_url_content,
     normalize,
     normalize_link,
 )
+
+from page_loader.resources import find_assets, find_images
 
 from page_loader import download
 
@@ -97,17 +97,16 @@ def test_normalize_link():
         assert normalize_link(link, URL) == expected[num]
 
 
-def test_get_url(requests_mock, get_html_doc):
+def test_get_url_content(requests_mock, get_html_doc):
     expected = get_html_doc
     requests_mock.get(URL, text=expected)
-    tested = get_html(URL)
-    tested = tested.text
-    assert expected == tested
+    tested = get_url_content(URL)
+    assert expected == tested.decode('utf-8')
 
 
 def test_get_invalid_url():
     with pytest.raises(Exception):
-        get_html(URL)
+        get_url_content(URL)
 
 
 def test_download_html(get_html_doc):

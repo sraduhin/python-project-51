@@ -41,10 +41,10 @@ def normalize(src):
     return '-'.join(parts).strip('-.').replace('--', '-')
 
 
-def get_html(url):
+def get_url_content(url):
     response = requests.get(url)
     response.raise_for_status()
-    return response
+    return response.content
 
 
 def find_images(html):
@@ -77,9 +77,9 @@ def find_assets(html, parent):
 
 def download_file(origin_path, download_path):
     logging.debug(f'downloading {origin_path}')
-    response = get_html(origin_path)
+    response = get_url_content(origin_path)
     with open(download_path, 'wb') as copy:
-        copy.write(response.content)
+        copy.write(response)
     logging.debug(f'success download to {download_path}')
 
 
