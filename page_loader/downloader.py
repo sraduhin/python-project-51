@@ -1,59 +1,29 @@
 import os
 import logging
 
+from page_loader.urls import create_local_name
+from page_loader.assets import get_content_and_assets, download_assets
 
-from bs4 import BeautifulSoup
-# from bs4.formatter import HTMLFormatter
-from progress.bar import IncrementalBar
-
-from page_loader.utils import (
-    create_local_name,
-    download_file,
-    download_html,
-    get_url_content,
-    normalize_link,
-)
-from page_loader.resources import get_locals
-
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
 
-def download(url, dir, downloader=download_file):
+def download(url, dir, downloader=download_assets):
     logging.info(f'requested url: {url}')
 
     if not os.path.isdir(dir):
         raise FileNotFoundError(f'{dir} doesnt exist')
 
-    response = get_url_content(url)
-    html, resouses_path = get_locals(response)
-    '''html = BeautifulSoup(response, 'html.parser')
-
+    html, assets = get_content_and_assets(url)
     local_page_name = create_local_name(url)
-    local_dir = local_page_name.replace('.html', '_files')
 
-    images = find_images(html)
-    assets = find_assets(html, parent=url)
-    resourses = images + assets
-    # html = html.prettify(formatter=HTMLFormatter(indent=4))
-    html = html.prettify()'''
+    if assets:
+        assets_directory = local_page_name.replace('.html', '_files')
+        os.makedirs(os.path.join(dir, assets_directory), exist_ok=True)
+        downloader(assets, dir)
 
-    if resourses:
-        os.makedirs(os.path.join(dir, local_dir), exist_ok=True)
+    path = os.path.join(dir, local_page_name)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(html)
+        logging.info(f'html page has been successfully downloaded to {path}')
 
-        with IncrementalBar('Processing', max=len(resourses)) as bar:
-            for path in resourses:
-                full_origin_path = normalize_link(path, parent=url)
-                local_file_name = create_local_name(full_origin_path)
-                relative_local_path = os.path.join(local_dir, local_file_name)
-                absolut_local_path = os.path.join(dir, relative_local_path)
-                downloader(full_origin_path, absolut_local_path)
-                # download_file(full_origin_path, absolut_local_path)
-                html = html.replace(path, relative_local_path)
-                logging.debug(
-                    f"{path} saved with new local name {local_file_name}"
-                )
-                bar.next()
-
-    absolut_page_path = os.path.join(dir, local_page_name)
-    download_html(html, absolut_page_path)
-    return absolut_page_path
+    return path

@@ -7,23 +7,17 @@ import pytest
 from bs4 import BeautifulSoup
 
 from urllib.parse import urlparse
-from page_loader.utils import (
-    create_local_name,
-    download_file,
-    download_html,
-    get_url_content,
-    normalize,
-    normalize_link,
-)
-
-from page_loader.resources import find_assets, find_images
-
 from page_loader import download
+from page_loader.assets import get_content_and_assets, download_assets
+from page_loader.urls import create_local_name, get_url, get_url_content
+from page_loader.urls import normalize
+
 
 FIXTURES_DIR = os.path.join('tests', 'fixtures', 'expected')
 SOURCE_HTML = os.path.join(FIXTURES_DIR, 'source.html')
 RESULT_HTML = os.path.join(FIXTURES_DIR, 'result.html')
-URL = 'https://ru.hexlet.io/n_a.me/to-l_.oc/al-'
+URL = 'https://ru.hexlet.io/courses'
+URL_HARD = 'https://ru.hexlet.io/n_a.me/to-l_.oc/al-'
 
 
 @pytest.fixture
@@ -53,20 +47,50 @@ def fake_downloader(*_):
 
 # test downloader.py
 def test_download(requests_mock, get_html_doc, get_html_result):
-    url = 'https://ru.hexlet.io/courses'
     downloader = fake_downloader
     expected = get_html_result
     with tempfile.TemporaryDirectory() as tempdir:
-        requests_mock.get(url, text=get_html_doc)
-        temp_file = download(url, tempdir, downloader)
+        requests_mock.get(URL, text=get_html_doc)
+        temp_file = download(URL, tempdir, downloader)
         with open(temp_file, 'r', encoding="utf-8") as tested:
             tested = tested.read()
-            print(tested)
-            print(expected)
             assert expected == tested
 
 
-# test utils.py
+# test resources
+def test_get_content(requests_mock, get_html_doc, get_html_result):
+    expected = get_html_result
+    requests_mock.get(URL, text=get_html_doc)
+    tested, _ = get_content_and_assets(URL)
+    assert expected == tested
+
+
+def test_get_assets(requests_mock):
+    script = '/assets/menu.css'
+    url = 'https://simple/url.html'
+    requests_mock.get(url, text=f'<!DOCTYPE html><link href="{script}"/>')
+    _, assets = get_content_and_assets(url)
+    print('asdfasdlfkjasdlfkjjas;dlfkjja')
+    print(assets)
+    assert assets == [
+        (f'https://simple{script}', 'simple-url_files/simple-assets-menu.css')
+    ]
+
+
+def test_download_img(requests_mock):
+    fixture_path_file = pathlib.Path(FIXTURES_DIR, 'harold_one.png')
+    with open(fixture_path_file, 'rb') as expected:
+        expected = expected.read()
+        requests_mock.get(URL, content=expected)
+        with tempfile.TemporaryDirectory() as tempdir:
+            temp_file = os.path.join(tempdir, 'temp')
+            download_assets([(URL, temp_file)])
+            with open(temp_file, 'rb') as tested:
+                tested = tested.read()
+                assert expected == tested
+
+
+# test urls.py
 def test_create_local_name():
     urls = [
         'http://host/path_page',
@@ -79,11 +103,10 @@ def test_create_local_name():
     tested = []
     for url in urls:
         tested.append(create_local_name(url))
-    print(tested)
     assert expected == tested
 
 
-def test_normalize_link():
+def test_get_url():
     links = [
         '/relative/link.li',
         'https://absolut/link.li',
@@ -94,7 +117,7 @@ def test_normalize_link():
         f'{links[1]}',
     ]
     for num, link in enumerate(links):
-        assert normalize_link(link, URL) == expected[num]
+        assert get_url(link, URL) == expected[num]
 
 
 def test_get_url_content(requests_mock, get_html_doc):
@@ -106,62 +129,22 @@ def test_get_url_content(requests_mock, get_html_doc):
 
 def test_get_invalid_url():
     with pytest.raises(Exception):
-        get_url_content(URL)
+        get_url_content(URL_HARD)
 
 
-def test_download_html(get_html_doc):
-    expected = get_html_doc
-    with tempfile.TemporaryDirectory() as tempdir:
-        temp_file = os.path.join(tempdir, 'temp')
-        download_html(expected, temp_file)
-        with open(temp_file, 'r', encoding="utf-8") as tested:
-            tested = tested.read()
-            assert expected == tested
-
-
-def test_download_file(requests_mock, get_html_doc):
-    expected = get_html_doc
-    requests_mock.get(URL, text=expected)
-    with tempfile.TemporaryDirectory() as tempdir:
-        temp_file = os.path.join(tempdir, 'temp')
-        download_file(URL, temp_file)
-        with open(temp_file, 'r', encoding='utf-8') as tested:
-            tested = tested.read()
-            assert expected == tested
-
-
-def test_download_img(requests_mock):
+'''def test_download_img(requests_mock):
     fixture_path_file = pathlib.Path(FIXTURES_DIR, 'harold_one.png')
     with open(fixture_path_file, 'rb') as expected:
         expected = expected.read()
-        requests_mock.get(URL, content=expected)
         with tempfile.TemporaryDirectory() as tempdir:
             temp_file = os.path.join(tempdir, 'temp')
-            download_file(URL, temp_file)
+            download_assets(expected, temp_file)
             with open(temp_file, 'rb') as tested:
                 tested = tested.read()
-                assert expected == tested
+                assert expected == tested'''
 
 
 def test_normalize():
-    tested = urlparse(URL).path
+    tested = urlparse(URL_HARD).path
     expected = 'n-a-me-to-l-oc-al'
     assert normalize(tested) == expected
-
-
-def test_find_images(get_html_soup):
-    expected = [
-        "/assets/professions/nodejs.png",
-        "/assets/professions/nodejs.jpg",
-    ]
-    assert sorted(find_images(get_html_soup)) == sorted(expected)
-
-
-def test_find_assets(get_html_soup):
-    expected = [
-        "https://ru.hexlet.io/packs/js/runtime.js",
-        "/assets/application.css",
-        "https://ru.hexlet.io/styles/application.css",
-        "/courses",
-    ]
-    assert sorted(find_assets(get_html_soup, URL)) == sorted(expected)

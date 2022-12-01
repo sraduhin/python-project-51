@@ -4,6 +4,10 @@ install:
 build:
 	poetry build
 
+#delete this
+run:
+	poetry run page-loader https://page-loader.hexlet.repl.co/ -o var/tmp
+
 package-install:
 	python3 -m pip install --user dist/*.whl
 

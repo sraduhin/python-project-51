@@ -17,5 +17,4 @@
 <code>page-loader -o DOWNLOAD_DIR PAGE_URL</code>
 
 ## How to use
-
-<code>soon</code>
+<a href="https://asciinema.org/a/zKQq2XfBcfdG6t3ujJ3py1ZbW" target="_blank"><img src="https://asciinema.org/a/zKQq2XfBcfdG6t3ujJ3py1ZbW.svg" /></a>
